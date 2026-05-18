@@ -184,6 +184,14 @@ main{max-width:1280px;margin:0 auto;padding:26px 40px 60px;}
 #stb:hover{transform:scale(1.1);}
 
 mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;padding:0 2px;}
+.sync-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;padding:4px 0;min-height:20px;transition:all .3s;}
+.sync-ok{color:#16a34a;} .sync-err{color:#dc2626;} .sync-ing{color:var(--accent);}
+/* loading overlay */
+.loading-ov{display:none;position:fixed;inset:0;background:rgba(255,255,255,.75);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.loading-ov.on{display:flex;}
+.loading-spin{width:40px;height:40px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:13px;color:var(--sub);font-weight:500;}
 
 @media(max-width:768px){
   .hero{padding:22px 18px 28px;}
@@ -245,6 +253,8 @@ mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;pa
 <div class="stats">
   <span><span class="snum" id="vcnt">0</span> 개 질문 표시 중</span>
   <span>전체 <span class="snum" id="tcnt">0</span> 개</span>
+  <span id="syncStatus" class="sync-status"></span>
+  <button class="sb sb-sm" style="margin-left:auto" onclick="loadFromServer()" title="서버에서 최신 데이터 불러오기">🔄 새로고침</button>
 </div>
 
 <!-- LEVEL CARDS -->
@@ -271,6 +281,12 @@ mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;pa
 
 <main id="main"></main>
 <button id="stb" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- Loading overlay -->
+<div class="loading-ov" id="loadingOv">
+  <div class="loading-spin"></div>
+  <div class="loading-msg" id="loadingMsg">데이터 불러오는 중…</div>
+</div>
 
 <!-- Global tooltips: fixed position, never clipped -->
 <div class="gtip" id="bloomTip"></div>
@@ -470,18 +486,95 @@ const BI={
   3:{badge:'3단계 · Health Consulting',bloom:'Bloom: 평가(Evaluate) + 창조(Create)',desc:'"~을 어떻게 예방할까?", "패러다임은 어떻게 변화되었나?" 형태로 판단·제안하는 질문.',e:'🟠'},
 };
 
+// ══════════════════════════════════════════════════════════
+// ★ Google Apps Script 웹앱 URL을 아래에 붙여넣으세요 ★
+// 배포 후 받은 URL 예: https://script.google.com/macros/s/XXXX/exec
+// ══════════════════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXEiChFlomIVHpZYFjoKhHWcNiy2YMwThu1I85e9pxUgBGoEaJF_lRZ16UaZ6XVydQ/exec';
+
 // ══════════════════════
 // STATE
 // ══════════════════════
-let Qs=[],custSys=[],admin=false,lvF=null,sysF=null,dateF=null,srchF='',delId=null,editId=null;
+let Qs=[],custSys=[],admin=false;
+let lvF=null,sysF=null,dateF=null,srchF='';
+let delId=null,editId=null;
 const PIN='1234';
 
-function load(){
-  const q=localStorage.getItem('iq3');Qs=q?JSON.parse(q):JSON.parse(JSON.stringify(DQ));
-  const s=localStorage.getItem('is3');custSys=s?JSON.parse(s):[];
-  if(!q)save();
+// ══════════════════════
+// API 통신
+// ══════════════════════
+function showLoading(msg='데이터 불러오는 중…'){
+  document.getElementById('loadingOv').style.display='flex';
+  document.getElementById('loadingMsg').textContent=msg;
 }
-function save(){localStorage.setItem('iq3',JSON.stringify(Qs));localStorage.setItem('is3',JSON.stringify(custSys));}
+function hideLoading(){ document.getElementById('loadingOv').style.display='none'; }
+function setSyncStatus(state,msg){
+  const el=document.getElementById('syncStatus');
+  const icons={ok:'✅',err:'❌',ing:'⏳'};
+  el.textContent=(icons[state]||'')+'  '+msg;
+  el.className='sync-status sync-'+state;
+  if(state==='ok') setTimeout(()=>{el.textContent='';el.className='sync-status';},3000);
+}
+
+async function apiGet(){
+  const r=await fetch(SCRIPT_URL+'?action=getAll');
+  if(!r.ok) throw new Error('서버 응답 오류 '+r.status);
+  return r.json();
+}
+async function apiPost(body){
+  const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('서버 응답 오류 '+r.status);
+  return r.json();
+}
+
+async function loadFromServer(){
+  if(SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
+    // URL 미설정 시 기본 데이터로 동작
+    Qs=JSON.parse(JSON.stringify(DQ));
+    custSys=[];
+    render();
+    setSyncStatus('err','⚠️ SCRIPT_URL을 설정해 주세요 (현재 기본 데이터 표시 중)');
+    return;
+  }
+  showLoading('Google Sheets에서 데이터 불러오는 중…');
+  try{
+    const data=await apiGet();
+    if(!data.ok) throw new Error(data.msg);
+    Qs=data.questions;
+    custSys=data.customSystems||[];
+    render();
+    setSyncStatus('ok','최신 데이터 로드 완료');
+  }catch(e){
+    setSyncStatus('err','로드 실패: '+e.message);
+    // 실패 시 빈 배열 유지
+    Qs=[];custSys=[];render();
+  }finally{ hideLoading(); }
+}
+
+async function serverSaveQ(q){
+  setSyncStatus('ing','저장 중…');
+  try{
+    const res=await apiPost({action:'saveQuestion',question:q});
+    if(!res.ok) throw new Error(res.msg);
+    setSyncStatus('ok','저장 완료');
+  }catch(e){ setSyncStatus('err','저장 실패: '+e.message); throw e; }
+}
+async function serverDeleteQ(id){
+  setSyncStatus('ing','삭제 중…');
+  try{
+    const res=await apiPost({action:'deleteQuestion',id});
+    if(!res.ok) throw new Error(res.msg);
+    setSyncStatus('ok','삭제 완료');
+  }catch(e){ setSyncStatus('err','삭제 실패: '+e.message); throw e; }
+}
+async function serverAddSys(name){
+  const res=await apiPost({action:'addSystem',name});
+  if(!res.ok) throw new Error(res.msg);
+}
+async function serverRemoveSys(name){
+  const res=await apiPost({action:'removeSystem',name});
+  if(!res.ok) throw new Error(res.msg);
+}
 function getSys(){return[...new Set(['혈액·면역계','순환계','내분비계',...custSys,...Qs.map(q=>q.system)])];}
 function getDates(){return[...new Set(Qs.map(q=>q.date).filter(Boolean))].sort();}
 function kwd(q,k){return(q.kwDesc&&q.kwDesc[k])||KWD[k]||null;}
@@ -605,7 +698,13 @@ function onDateChange(s){dateF=s.value||null;render();}
 function doFilter(){srchF=document.getElementById('srch').value.trim();render();}
 function skw(kw){document.getElementById('srch').value=kw;srchF=kw;render();}
 function resetFilters(){if(!confirm('모든 필터와 검색어를 초기화하겠습니다.\n질문 데이터는 유지됩니다.'))return;lvF=null;sysF=null;dateF=null;srchF='';document.getElementById('srch').value='';render();}
-function quickDate(id,v){const i=Qs.findIndex(q=>q.id===id);if(i!==-1){Qs[i].date=v;save();render();}}
+function quickDate(id,v){
+  const i=Qs.findIndex(q=>q.id===id);
+  if(i===-1) return;
+  Qs[i].date=v;
+  serverSaveQ(Qs[i]).catch(()=>{});
+  render();
+}
 
 // ══════════════════════
 // ADMIN
@@ -630,15 +729,23 @@ function buildSysSel(sel){const el=document.getElementById('eSys');el.innerHTML=
 function openAddM(sys){editId=null;document.getElementById('editTitle').textContent='핵심질문 추가';document.getElementById('eid').value='';buildSysSel(sys||getSys()[0]);document.getElementById('eLv').value='1';document.getElementById('eDate').value='';document.getElementById('eQ').value='';document.getElementById('eKw').value='';document.getElementById('eKwD').value='';document.getElementById('newSysG').style.display='none';document.getElementById('editOv').classList.add('op');}
 function openEditM(id){const q=Qs.find(x=>x.id===id);if(!q)return;editId=id;document.getElementById('editTitle').textContent='핵심질문 수정';document.getElementById('eid').value=id;buildSysSel(q.system);document.getElementById('eLv').value=q.level;document.getElementById('eDate').value=q.date||'';document.getElementById('eQ').value=q.question;document.getElementById('eKw').value=q.keywords.join(', ');document.getElementById('eKwD').value=Object.entries(q.kwDesc||{}).map(([k,v])=>`${k}|${v}`).join('\n');document.getElementById('newSysG').style.display='none';document.getElementById('editOv').classList.add('op');}
 function closeEditOv(){document.getElementById('editOv').classList.remove('op');}
-function saveQ(){
+async function saveQ(){
   let sys=document.getElementById('eSys').value;
-  if(sys==='__new__'){sys=document.getElementById('newSysIn').value.trim();if(!sys){alert('새 계통 이름을 입력하세요.');return;}if(!custSys.includes(sys))custSys.push(sys);}
+  if(sys==='__new__'){sys=document.getElementById('newSysIn').value.trim();if(!sys){alert('새 계통 이름을 입력하세요.');return;}if(!custSys.includes(sys)){custSys.push(sys);await serverAddSys(sys).catch(()=>{});}}
   const lv=parseInt(document.getElementById('eLv').value),date=document.getElementById('eDate').value,q=document.getElementById('eQ').value.trim(),kws=document.getElementById('eKw').value.split(',').map(k=>k.trim()).filter(Boolean);
   const kd={};document.getElementById('eKwD').value.trim().split('\n').forEach(ln=>{const[k,...r]=ln.split('|');if(k&&r.length)kd[k.trim()]=r.join('|').trim();});
   if(!q||!sys){alert('질문과 계통을 입력해 주세요.');return;}
-  if(editId){const i=Qs.findIndex(x=>x.id===editId);if(i!==-1)Qs[i]={...Qs[i],system:sys,level:lv,date,question:q,keywords:kws,kwDesc:kd};}
-  else{const m=Qs.reduce((mx,x)=>Math.max(mx,x.num),0);Qs.push({id:'q'+Date.now(),num:m+1,level:lv,system:sys,date,question:q,keywords:kws,kwDesc:kd});}
-  save();closeEditOv();render();
+  let qObj;
+  if(editId){
+    const i=Qs.findIndex(x=>x.id===editId);
+    if(i!==-1){Qs[i]={...Qs[i],system:sys,level:lv,date,question:q,keywords:kws,kwDesc:kd};qObj=Qs[i];}
+  } else {
+    const m=Qs.reduce((mx,x)=>Math.max(mx,x.num),0);
+    qObj={id:'q'+Date.now(),num:m+1,level:lv,system:sys,date,question:q,keywords:kws,kwDesc:kd};
+    Qs.push(qObj);
+  }
+  try{ await serverSaveQ(qObj); }catch(e){ return; }
+  closeEditOv();render();
 }
 
 // ══════════════════════
@@ -646,7 +753,12 @@ function saveQ(){
 // ══════════════════════
 function openDelM(id){delId=id;document.getElementById('delOv').classList.add('op');}
 function closeDelOv(){document.getElementById('delOv').classList.remove('op');delId=null;}
-function doDelete(){if(!delId)return;Qs=Qs.filter(q=>q.id!==delId);save();closeDelOv();render();}
+async function doDelete(){
+  if(!delId) return;
+  try{ await serverDeleteQ(delId); }catch(e){ closeDelOv(); return; }
+  Qs=Qs.filter(q=>q.id!==delId);
+  closeDelOv();render();
+}
 
 // ══════════════════════
 // SYSTEM MANAGEMENT
@@ -662,8 +774,21 @@ function renderSysList(){
     el.appendChild(row);
   });
 }
-function addSys(){const n=document.getElementById('newSysN').value.trim();if(!n){alert('계통 이름을 입력하세요.');return;}if(!custSys.includes(n))custSys.push(n);save();document.getElementById('newSysN').value='';renderSysList();render();}
-function rmSys(s){if(Qs.some(q=>q.system===s)){alert(`'${s}' 계통에 연결된 질문이 있어 삭제할 수 없습니다.`);return;}custSys=custSys.filter(x=>x!==s);save();renderSysList();render();}
+async function addSys(){
+  const n=document.getElementById('newSysN').value.trim();
+  if(!n){alert('계통 이름을 입력하세요.');return;}
+  if(!custSys.includes(n)){
+    custSys.push(n);
+    await serverAddSys(n).catch(e=>setSyncStatus('err','계통 추가 실패: '+e.message));
+  }
+  document.getElementById('newSysN').value='';renderSysList();render();
+}
+async function rmSys(s){
+  if(Qs.some(q=>q.system===s)){alert(`'${s}' 계통에 연결된 질문이 있어 삭제할 수 없습니다.`);return;}
+  custSys=custSys.filter(x=>x!==s);
+  await serverRemoveSys(s).catch(e=>setSyncStatus('err','계통 삭제 실패: '+e.message));
+  renderSysList();render();
+}
 
 // ══════════════════════
 // EXPORT
@@ -683,7 +808,7 @@ function exportCsv(){
 // ══════════════════════
 document.querySelectorAll('.ov').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('op');}));
 window.addEventListener('scroll',()=>document.getElementById('stb').classList.toggle('on',scrollY>300),{passive:true});
-load();render();
+loadFromServer();
 </script>
 </body>
 </html>
