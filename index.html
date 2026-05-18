@@ -76,30 +76,88 @@ button,select,input,textarea{font-family:'Noto Sans KR',sans-serif;}
 .stats{display:flex;align-items:center;gap:16px;padding:10px 40px;border-bottom:1px solid var(--border);background:var(--bg);font-size:12px;color:var(--muted);}
 .snum{font-weight:700;color:var(--accent);}
 
-/* level cards */
-.lvcards{max-width:1280px;margin:24px auto 0;padding:0 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.lvcard{background:var(--surface);border-radius:var(--r);border:1.5px solid var(--border);padding:18px 20px;box-shadow:var(--sh1);transition:box-shadow .2s,transform .2s;}
-.lvcard:hover{box-shadow:var(--sh2);transform:translateY(-2px);}
-.lvcard.lv1{border-top:3px solid var(--lv1-c);}
-.lvcard.lv2{border-top:3px solid var(--lv2-c);}
-.lvcard.lv3{border-top:3px solid var(--lv3-c);}
-.lcs{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
-.lv1 .lcs{color:var(--lv1-c);} .lv2 .lcs{color:var(--lv2-c);} .lv3 .lcs{color:var(--lv3-c);}
-.lcn{font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
-.lce{font-size:10px;color:var(--muted);margin-bottom:8px;font-weight:500;}
-.lcb{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:6px;}
-.lv1 .lcb{background:var(--lv1-bb);color:var(--lv1-bt);} .lv2 .lcb{background:var(--lv2-bb);color:var(--lv2-bt);} .lv3 .lcb{background:var(--lv3-bb);color:var(--lv3-bt);}
-.lcd{font-size:11px;color:var(--sub);line-height:1.65;}
-.lck{margin-top:8px;font-size:10px;font-weight:600;color:var(--muted);}
+/* ── LEVEL CARDS: 외부(전체) + 내부(각 단계) 이중 토글 ── */
+.lvcards-wrap{max-width:1280px;margin:16px auto 0;padding:0 40px;}
 
-/* main */
-main{max-width:1280px;margin:0 auto;padding:26px 40px 60px;}
+/* 전체 토글 버튼 */
+.lvc-outer-hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;background:var(--surface);
+  border:1.5px solid var(--border);border-radius:var(--r);
+  cursor:pointer;user-select:none;
+  box-shadow:var(--sh1);transition:background .15s,border-color .2s;
+}
+.lvc-outer-hdr:hover{background:var(--surface2);border-color:var(--border2);}
+.lvc-outer-title{font-size:13px;font-weight:700;color:var(--text);}
+.lvc-outer-sub{font-size:11px;color:var(--muted);margin-left:4px;}
+.lvc-outer-arrow{margin-left:auto;font-size:12px;color:var(--muted);transition:transform .28s;}
+.lvcards-wrap.open .lvc-outer-arrow{transform:rotate(180deg);}
+.lvcards-wrap.open .lvc-outer-hdr{
+  border-radius:var(--r) var(--r) 0 0;
+  border-bottom-color:transparent;
+}
+
+/* 내부 아코디언 컨테이너 */
+.lvcards{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s ease;
+  border:1.5px solid var(--border);
+  border-top:none;
+  border-radius:0 0 var(--r) var(--r);
+  box-shadow:var(--sh1);
+}
+.lvcards-wrap.open .lvcards{max-height:600px;}
+
+/* 각 단계 카드 */
+.lvcard{background:var(--surface);overflow:hidden;}
+.lvcard+.lvcard{border-top:1px solid var(--border);}
+.lvcard.lv1{border-left:4px solid var(--lv1-c);}
+.lvcard.lv2{border-left:4px solid var(--lv2-c);}
+.lvcard.lv3{border-left:4px solid var(--lv3-c);}
+
+/* 각 단계 토글 헤더 */
+.lvc-hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.lvc-hdr:hover{background:var(--surface2);}
+.lvc-step{
+  font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;flex-shrink:0;
+  padding:2px 8px;border-radius:4px;
+}
+.lv1 .lvc-step{background:var(--lv1-bb);color:var(--lv1-bt);}
+.lv2 .lvc-step{background:var(--lv2-bb);color:var(--lv2-bt);}
+.lv3 .lvc-step{background:var(--lv3-bb);color:var(--lv3-bt);}
+.lvc-name{font-weight:700;font-size:13px;color:var(--text);}
+.lvc-en{font-size:10px;color:var(--muted);font-weight:400;margin-left:2px;}
+.lvc-bloom{
+  margin-left:auto;font-size:10px;font-weight:600;
+  padding:2px 10px;border-radius:20px;flex-shrink:0;
+}
+.lv1 .lvc-bloom{background:var(--lv1-bb);color:var(--lv1-bt);}
+.lv2 .lvc-bloom{background:var(--lv2-bb);color:var(--lv2-bt);}
+.lv3 .lvc-bloom{background:var(--lv3-bb);color:var(--lv3-bt);}
+.lvc-arrow{font-size:11px;color:var(--muted);margin-left:8px;transition:transform .25s;flex-shrink:0;}
+.lvcard.open .lvc-arrow{transform:rotate(180deg);}
+
+/* 각 단계 펼쳐지는 내용 */
+.lvc-body{max-height:0;overflow:hidden;transition:max-height .28s ease;}
+.lvcard.open .lvc-body{max-height:200px;}
+.lvc-body-inner{padding:10px 20px 14px 20px;border-top:1px solid var(--border);background:var(--surface2);}
+.lcd{font-size:12px;color:var(--sub);line-height:1.7;margin-bottom:6px;}
+.lck{font-size:11px;font-weight:600;color:var(--muted);}
+.lcs{display:none;}.lcn{display:none;}.lce{display:none;}.lcb{display:none;}
+
+/* ── MAIN ── */
+main{max-width:1280px;margin:0 auto;padding:24px 40px 60px;}
 .ssec{margin-bottom:40px;}
 .shdr{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid var(--border);}
 .sicon{font-size:20px;}
-.sname{font-family:'Noto Sans KR',sans-serif;font-size:17px;font-weight:700;color:var(--text);}
+.sname{font-size:17px;font-weight:700;color:var(--text);}
 .scnt{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:10px;font-weight:500;}
-.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
 
 /* question card */
 .qcard{background:var(--surface);border-radius:var(--r);border:1.5px solid var(--border);box-shadow:var(--sh1);padding:18px 20px;transition:all .22s;animation:fup .3s ease both;position:relative;}
@@ -205,14 +263,69 @@ mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;pa
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-msg{font-size:13px;color:var(--sub);font-weight:500;}
 
+/* ── 모바일 최적화 ── */
 @media(max-width:768px){
-  .hero{padding:22px 18px 28px;}
+  /* 헤더 */
+  .hero{padding:20px 16px 24px;}
+  .hero-title{font-size:22px;}
+  .hero-sub{font-size:11px;}
+  .hero-acts{width:100%;gap:6px;}
+  .hbtn{padding:6px 11px;font-size:11px;}
+  .lgbar{gap:5px;margin-top:14px;}
+  .lpill{padding:5px 10px;font-size:11px;gap:5px;}
+  .ldot{width:7px;height:7px;}
+  .lcnt{display:none;}
+
+  /* NotebookLM 배너 */
+  .nblm-bar{padding:8px 16px;}
+  .nblm-label{font-size:10px;}
+  .nblm-link{padding:4px 10px;font-size:11px;}
+
+  /* 필터 패널 */
   .fpanel{padding:10px 16px 9px;}
-  .stats,.lvcards,main{padding-left:16px;padding-right:16px;}
-  .lvcards{grid-template-columns:1fr;}
+  .frow{gap:8px;}
+  .flabel{display:none;}
+  .chips{gap:4px;}
+  .chip{padding:4px 10px;font-size:11px;}
+  .ddlabel{display:none;}
+  .dds{font-size:11px;padding:5px 24px 5px 10px;}
+  .swrap{width:100%;}
+  .sinput{width:100%;font-size:12px;}
+
+  /* 통계바 */
+  .stats{padding:8px 16px;font-size:11px;gap:10px;}
+
+  /* 위계 토글 */
+  .lvcards-wrap{padding:0 16px;margin-top:12px;}
+  .lvc-outer-hdr{padding:10px 14px;}
+  .lvc-outer-title{font-size:12px;}
+  .lvc-outer-sub{display:none;}
+  .lvc-bloom{display:none;}
+  .lvc-hdr{padding:10px 14px;gap:8px;}
+  .lvc-name{font-size:12px;}
+  .lvc-en{display:none;}
+  .lvc-body-inner{padding:8px 14px 12px;}
+  .lcd{font-size:11px;}
+  .lck{font-size:10px;}
+
+  /* 카드 그리드 */
+  main{padding:16px 16px 50px;}
+  .ssec{margin-bottom:28px;}
+  .shdr{gap:7px;padding-bottom:9px;margin-bottom:12px;}
+  .sname{font-size:15px;}
+  .cgrid{grid-template-columns:1fr;gap:12px;}
+  .qcard{padding:14px 15px;}
+  .qtxt{font-size:13px;}
+  .kwtag{font-size:10px;padding:2px 7px;}
+  .lbadge{font-size:9px;padding:3px 8px;}
+  .cnum{font-size:9px;}
+
+  /* 폼 */
   .frow2{grid-template-columns:1fr;}
-  .sinput{width:100%;}
-  .cgrid{grid-template-columns:1fr;}
+  .modal{padding:22px 18px;}
+
+  /* 스크롤 버튼 */
+  #stb{width:38px;height:38px;font-size:16px;bottom:16px;right:16px;}
 }
 </style>
 </head>
@@ -281,25 +394,59 @@ mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;pa
   <button class="sb sb-sm" style="margin-left:auto" onclick="loadFromServer()" title="서버에서 최신 데이터 불러오기">🔄 새로고침</button>
 </div>
 
-<!-- LEVEL CARDS -->
-<div class="lvcards">
-  <div class="lvcard lv1">
-    <div class="lcs">1단계</div><div class="lcn">개념의 구조화</div><div class="lce">Concept Mapping</div>
-    <span class="lcb">Bloom: 기억(Remember) + 이해(Understand)</span>
-    <p class="lcd">인체 시스템의 핵심 해부학적 구조와 생리학적 정의를 정확히 이해하고 정리함. "~은 무엇인가?", "~은 어떻게 이루어지나?" 형태의 질문.</p>
-    <div class="lck">📌 평가역량: 기초 지식 습득 및 정리 능력</div>
+<!-- LEVEL CARDS: 외부 전체 토글 + 내부 각 단계 토글 -->
+<div class="lvcards-wrap" id="lvcardsWrap">
+  <!-- 전체 토글 헤더 -->
+  <div class="lvc-outer-hdr" onclick="toggleAllLvc()">
+    <span>📚</span>
+    <span class="lvc-outer-title">질문 위계 안내</span>
+    <span class="lvc-outer-sub">1단계 ~ 3단계 Bloom 분류 설명</span>
+    <span class="lvc-outer-arrow">▼</span>
   </div>
-  <div class="lvcard lv2">
-    <div class="lcs">2단계</div><div class="lcn">메커니즘 인사이트</div><div class="lce">Mechanism Insight</div>
-    <span class="lcb">Bloom: 적용(Apply) + 분석(Analyze)</span>
-    <p class="lcd">질환 발생 경로, 약물 작용 원리, 증상 발현의 인과관계를 논리적 흐름도(Flowchart)로 시각화·분석함. "~이 나타나는 이유는?", "~는 어떻게 작용할까?"</p>
-    <div class="lck">📌 평가역량: 인과관계 추론 및 시스템적 사고</div>
-  </div>
-  <div class="lvcard lv3">
-    <div class="lcs">3단계</div><div class="lcn">융합적 문제해결</div><div class="lce">Health Consulting</div>
-    <span class="lcb">Bloom: 평가(Evaluate) + 창조(Create)</span>
-    <p class="lcd">질병/사례를 분석하여 예방 및 중재 방안을 제안하거나 최신 의학 기술, 진로 등과 연결함. "~을 어떻게 예방할까?", "패러다임은 어떻게 변화되었나?"</p>
-    <div class="lck">📌 평가역량: 비판적 사고 및 진로 역량</div>
+  <!-- 내부 아코디언 -->
+  <div class="lvcards">
+    <div class="lvcard lv1" id="lvc1">
+      <div class="lvc-hdr" onclick="toggleLvc(1)">
+        <span class="lvc-step">1단계</span>
+        <span class="lvc-name">개념의 구조화 <span class="lvc-en">· Concept Mapping</span></span>
+        <span class="lvc-bloom">Bloom: 기억 + 이해</span>
+        <span class="lvc-arrow">▼</span>
+      </div>
+      <div class="lvc-body">
+        <div class="lvc-body-inner">
+          <p class="lcd">인체 시스템의 핵심 해부학적 구조와 생리학적 정의를 정확히 이해하고 정리함. "~은 무엇인가?", "~은 어떻게 이루어지나?" 형태의 질문.</p>
+          <div class="lck">📌 평가역량: 기초 지식 습득 및 정리 능력</div>
+        </div>
+      </div>
+    </div>
+    <div class="lvcard lv2" id="lvc2">
+      <div class="lvc-hdr" onclick="toggleLvc(2)">
+        <span class="lvc-step">2단계</span>
+        <span class="lvc-name">메커니즘 인사이트 <span class="lvc-en">· Mechanism Insight</span></span>
+        <span class="lvc-bloom">Bloom: 적용 + 분석</span>
+        <span class="lvc-arrow">▼</span>
+      </div>
+      <div class="lvc-body">
+        <div class="lvc-body-inner">
+          <p class="lcd">질환 발생 경로, 약물 작용 원리, 증상 발현의 인과관계를 논리적 흐름도(Flowchart)로 시각화·분석함. "~이 나타나는 이유는?", "~는 어떻게 작용할까?"</p>
+          <div class="lck">📌 평가역량: 인과관계 추론 및 시스템적 사고</div>
+        </div>
+      </div>
+    </div>
+    <div class="lvcard lv3" id="lvc3">
+      <div class="lvc-hdr" onclick="toggleLvc(3)">
+        <span class="lvc-step">3단계</span>
+        <span class="lvc-name">융합적 문제해결 <span class="lvc-en">· Health Consulting</span></span>
+        <span class="lvc-bloom">Bloom: 평가 + 창조</span>
+        <span class="lvc-arrow">▼</span>
+      </div>
+      <div class="lvc-body">
+        <div class="lvc-body-inner">
+          <p class="lcd">질병/사례를 분석하여 예방 및 중재 방안을 제안하거나 최신 의학 기술, 진로 등과 연결함. "~을 어떻게 예방할까?", "패러다임은 어떻게 변화되었나?"</p>
+          <div class="lck">📌 평가역량: 비판적 사고 및 진로 역량</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -538,8 +685,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXEiChFlomIVHpZYFjo
 // 여러 개는 쉼표로 구분, 필요 없으면 빈 배열 [] 로 두세요
 // ══════════════════════════════════════════════════════════
 const NOTEBOOK_LINKS = [
-  // 예시 (실제 URL로 교체하세요):
-{ title: '인체구조와기능 수업자료 기반 인공지능 무엇이든 질문하세요', url: 'https://notebooklm.google.com/notebook/003a3c9d-dc74-4938-b2d9-a686e9639f2d' },
+  { title: '인체 구조와 기능 수업자료 인공지능 무엇이든 물어보세요', url: 'https://notebooklm.google.com/notebook/003a3c9d-dc74-4938-b2d9-a686e9639f2d' },
   // { title: '순환계 수업자료',      url: 'https://notebooklm.google.com/notebook/...' },
   // { title: '내분비계 수업자료',    url: 'https://notebooklm.google.com/notebook/...' },
 ];
@@ -765,6 +911,15 @@ function fb(text){const t=document.createElement('textarea');t.value=text;docume
 // FILTERS
 // ══════════════════════
 function setLv(l){lvF=lvF===l?null:l;render();}
+function toggleAllLvc(){
+  document.getElementById('lvcardsWrap').classList.toggle('open');
+}
+function toggleLvc(n){
+  // 외부가 닫혀 있으면 먼저 열기
+  const wrap=document.getElementById('lvcardsWrap');
+  if(!wrap.classList.contains('open')) wrap.classList.add('open');
+  document.getElementById('lvc'+n).classList.toggle('open');
+}
 function onDateChange(s){dateF=s.value||null;render();}
 function doFilter(){srchF=document.getElementById('srch').value.trim();render();}
 function skw(kw){document.getElementById('srch').value=kw;srchF=kw;render();}
