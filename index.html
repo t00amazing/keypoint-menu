@@ -184,6 +184,18 @@ main{max-width:1280px;margin:0 auto;padding:26px 40px 60px;}
 #stb:hover{transform:scale(1.1);}
 
 mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;padding:0 2px;}
+
+/* NotebookLM 배너 */
+.nblm-bar{background:linear-gradient(90deg,#eef2ff 0%,#f5f3ff 50%,#fdf4ff 100%);border-bottom:1px solid #ddd6fe;padding:10px 40px;}
+.nblm-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.nblm-label{font-size:11px;font-weight:700;color:#7c3aed;letter-spacing:.5px;white-space:nowrap;flex-shrink:0;}
+.nblm-links{display:flex;gap:8px;flex-wrap:wrap;flex:1;}
+.nblm-link{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;background:#fff;border:1.5px solid #c4b5fd;color:#6d28d9;font-size:12px;font-weight:600;text-decoration:none;transition:all .18s;white-space:nowrap;}
+.nblm-link:hover{background:#7c3aed;color:#fff;border-color:#7c3aed;transform:translateY(-1px);box-shadow:0 4px 12px rgba(124,58,237,.25);}
+.nblm-empty{font-size:12px;color:#a78bfa;font-style:italic;}
+.nblm-edit-wrap{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.nblm-edit-btn{font-size:10px;padding:4px 10px;border-radius:10px;border:1px solid #c4b5fd;background:transparent;color:#7c3aed;cursor:pointer;font-weight:600;transition:all .15s;white-space:nowrap;}
+.nblm-edit-btn:hover{background:#7c3aed;color:#fff;}
 .sync-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;padding:4px 0;min-height:20px;transition:all .3s;}
 .sync-ok{color:#16a34a;} .sync-err{color:#dc2626;} .sync-ing{color:var(--accent);}
 /* loading overlay */
@@ -219,7 +231,8 @@ mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;pa
         <div class="admin-ind" id="admInd">🔓 관리 모드</div>
         <button class="hbtn" id="sysBtn" onclick="openSysModal()" style="display:none">🗂️ 계통 관리</button>
         <button class="hbtn" id="xlsBtn" onclick="exportCsv()" style="display:none">📥 엑셀 저장</button>
-        <button class="hbtn" id="resetBtn" onclick="resetFilters()" style="display:none">↺ 초기화</button>
+        <button class="hbtn" id="clearDatesBtn" onclick="clearAllDates()" style="display:none">📅 날짜 전체 초기화</button>
+        <button class="hbtn hbtn-solid" onclick="resetFilters()">↺ 필터 초기화</button>
         <button class="hbtn hbtn-solid" id="admBtn" onclick="toggleAdmin()">⚙️ 관리 모드</button>
       </div>
     </div>
@@ -230,6 +243,17 @@ mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;pa
     </div>
   </div>
 </header>
+
+<!-- NotebookLM 링크 배너 -->
+<div class="nblm-bar" id="nblmBar">
+  <div class="nblm-inner">
+    <span class="nblm-label">📓 수업 자료 (NotebookLM)</span>
+    <div class="nblm-links" id="nblmLinks">
+      <span class="nblm-empty" id="nblmEmpty">HTML 파일 상단 NOTEBOOK_LINKS 배열에 링크를 입력하세요.</span>
+    </div>
+    <div class="nblm-edit-wrap" id="nblmEditWrap" style="display:none;"></div>
+  </div>
+</div>
 
 <!-- FILTER PANEL – sits flush below hero, no overlap -->
 <div class="fpanel">
@@ -291,6 +315,22 @@ mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;pa
 <!-- Global tooltips: fixed position, never clipped -->
 <div class="gtip" id="bloomTip"></div>
 <div class="gtip" id="kwTip"></div>
+
+<!-- 날짜 전체 초기화 확인 모달 -->
+<div class="ov" id="clearDatesOv">
+  <div class="modal" style="max-width:360px">
+    <div class="mtitle">📅 날짜 전체 초기화</div>
+    <p style="font-size:13px;color:var(--sub);line-height:1.7;margin:10px 0 20px">
+      날짜가 지정된 질문 <strong id="clearDatesCount" style="color:var(--accent)">0</strong>개의<br>
+      수업날짜를 모두 삭제합니다.<br>
+      <span style="font-size:11px;color:var(--muted)">이 작업은 서버(Google Sheets)에도 즉시 반영됩니다.</span>
+    </p>
+    <div class="mfoot">
+      <button class="sb" onclick="document.getElementById('clearDatesOv').classList.remove('op')">취소</button>
+      <button class="sb sb-red" onclick="doClearAllDates()">초기화 실행</button>
+    </div>
+  </div>
+</div>
 
 <!-- PIN MODAL -->
 <div class="ov" id="pinOv">
@@ -492,6 +532,18 @@ const BI={
 // ══════════════════════════════════════════════════════════
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXEiChFlomIVHpZYFjoKhHWcNiy2YMwThu1I85e9pxUgBGoEaJF_lRZ16UaZ6XVydQ/exec';
 
+// ══════════════════════════════════════════════════════════
+// ★ NotebookLM 및 수업자료 링크를 아래에 직접 입력하세요 ★
+// { title: '표시될 이름', url: '링크 주소' } 형태로 추가
+// 여러 개는 쉼표로 구분, 필요 없으면 빈 배열 [] 로 두세요
+// ══════════════════════════════════════════════════════════
+const NOTEBOOK_LINKS = [
+  // 예시 (실제 URL로 교체하세요):
+  // { title: '인구조와기능 수업자료', url: 'https://notebooklm.google.com/notebook/003a3c9d-dc74-4938-b2d9-a686e9639f2d' },
+  // { title: '순환계 수업자료',      url: 'https://notebooklm.google.com/notebook/...' },
+  // { title: '내분비계 수업자료',    url: 'https://notebooklm.google.com/notebook/...' },
+];
+
 // ══════════════════════
 // STATE
 // ══════════════════════
@@ -499,6 +551,25 @@ let Qs=[],custSys=[],admin=false;
 let lvF=null,sysF=null,dateF=null,srchF='';
 let delId=null,editId=null;
 const PIN='1234';
+
+// NotebookLM 배너 렌더링 (NOTEBOOK_LINKS 배열 기반)
+function renderNblmBar(){
+  const linksEl=document.getElementById('nblmLinks');
+  const emptyEl=document.getElementById('nblmEmpty');
+  linksEl.innerHTML='';
+  if(!NOTEBOOK_LINKS||NOTEBOOK_LINKS.length===0){
+    if(emptyEl) emptyEl.style.display='';
+  } else {
+    if(emptyEl) emptyEl.style.display='none';
+    NOTEBOOK_LINKS.forEach(lk=>{
+      const a=document.createElement('a');
+      a.className='nblm-link';
+      a.href=lk.url; a.target='_blank'; a.rel='noopener noreferrer';
+      a.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>${lk.title}`;
+      linksEl.appendChild(a);
+    });
+  }
+}
 
 // ══════════════════════
 // API 통신
@@ -697,7 +768,15 @@ function setLv(l){lvF=lvF===l?null:l;render();}
 function onDateChange(s){dateF=s.value||null;render();}
 function doFilter(){srchF=document.getElementById('srch').value.trim();render();}
 function skw(kw){document.getElementById('srch').value=kw;srchF=kw;render();}
-function resetFilters(){if(!confirm('모든 필터와 검색어를 초기화하겠습니다.\n질문 데이터는 유지됩니다.'))return;lvF=null;sysF=null;dateF=null;srchF='';document.getElementById('srch').value='';render();}
+
+// 필터 초기화 — confirm 없이 바로 실행 (GitHub Pages에서 confirm 차단됨)
+function resetFilters(){
+  lvF=null;sysF=null;dateF=null;srchF='';
+  document.getElementById('srch').value='';
+  render();
+}
+
+// 날짜 개별 저장
 function quickDate(id,v){
   const i=Qs.findIndex(q=>q.id===id);
   if(i===-1) return;
@@ -706,12 +785,62 @@ function quickDate(id,v){
   render();
 }
 
+// 날짜 전체 초기화 — 커스텀 확인 다이얼로그 사용 (confirm 대신)
+function clearAllDates(){
+  const dated=Qs.filter(q=>q.date);
+  if(dated.length===0){
+    setSyncStatus('err','날짜가 지정된 질문이 없습니다.');
+    return;
+  }
+  // 커스텀 확인 모달 표시
+  document.getElementById('clearDatesCount').textContent=dated.length;
+  document.getElementById('clearDatesOv').classList.add('op');
+}
+async function doClearAllDates(){
+  document.getElementById('clearDatesOv').classList.remove('op');
+  const dated=Qs.filter(q=>q.date);
+  if(SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE'){
+    // 서버 미연결 시 로컬만 초기화
+    dated.forEach(q=>q.date='');
+    setSyncStatus('ok',`${dated.length}개 질문의 날짜가 초기화되었습니다.`);
+    dateF=null; render(); return;
+  }
+  setSyncStatus('ing',`날짜 초기화 중… (0/${dated.length})`);
+  let done=0;
+  for(const q of dated){
+    q.date='';
+    try{
+      await serverSaveQ({...q});
+      done++;
+      setSyncStatus('ing',`날짜 초기화 중… (${done}/${dated.length})`);
+    }catch(e){
+      setSyncStatus('err',`초기화 중 오류 (${done}/${dated.length}): ${e.message}`);
+      render(); return;
+    }
+  }
+  setSyncStatus('ok',`${done}개 질문의 날짜가 초기화되었습니다.`);
+  dateF=null;
+  render();
+}
+
 // ══════════════════════
 // ADMIN
 // ══════════════════════
 function toggleAdmin(){admin?exitAdmin():openPinOv();}
-function enterAdmin(){admin=true;document.getElementById('admInd').classList.add('on');document.getElementById('admBtn').textContent='🔒 종료';document.getElementById('xlsBtn').style.display='flex';document.getElementById('sysBtn').style.display='flex';document.getElementById('resetBtn').style.display='flex';render();}
-function exitAdmin(){admin=false;document.getElementById('admInd').classList.remove('on');document.getElementById('admBtn').textContent='⚙️ 관리 모드';document.getElementById('xlsBtn').style.display='none';document.getElementById('sysBtn').style.display='none';document.getElementById('resetBtn').style.display='none';render();}
+function enterAdmin(){
+  admin=true;
+  document.getElementById('admInd').classList.add('on');
+  document.getElementById('admBtn').textContent='🔒 종료';
+  ['xlsBtn','sysBtn','clearDatesBtn'].forEach(id=>document.getElementById(id).style.display='flex');
+  render();
+}
+function exitAdmin(){
+  admin=false;
+  document.getElementById('admInd').classList.remove('on');
+  document.getElementById('admBtn').textContent='⚙️ 관리 모드';
+  ['xlsBtn','sysBtn','clearDatesBtn'].forEach(id=>document.getElementById(id).style.display='none');
+  render();
+}
 
 // ══════════════════════
 // PIN
@@ -808,6 +937,7 @@ function exportCsv(){
 // ══════════════════════
 document.querySelectorAll('.ov').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('op');}));
 window.addEventListener('scroll',()=>document.getElementById('stb').classList.toggle('on',scrollY>300),{passive:true});
+renderNblmBar();
 loadFromServer();
 </script>
 </body>
