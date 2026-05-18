@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인체구조와 기능 · 핵심질문 메뉴판</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb; --surface:#fff; --surface2:#f0f3fa; --border:#e2e8f5; --border2:#d0d8ee;
+  --text:#1e2540; --sub:#5a6280; --muted:#9aa0bc;
+  --accent:#5b6cf9; --accent-lt:#eef0ff; --accent-dk:#3d4ed4;
+  --lv1-bg:#eef6ff; --lv1-bd:#bcd9f8; --lv1-c:#2d7dd2; --lv1-bb:#dbeeff; --lv1-bt:#1a5fa8; --lv1-tg:#e0efff;
+  --lv2-bg:#edfff5; --lv2-bd:#a8e8c4; --lv2-c:#1a9e5c; --lv2-bb:#d6f5e6; --lv2-bt:#0e6e3e; --lv2-tg:#d4f2e6;
+  --lv3-bg:#fff8ed; --lv3-bd:#f5d4a0; --lv3-c:#d97706; --lv3-bb:#feebc8; --lv3-bt:#92400e; --lv3-tg:#fde8bb;
+  --r:16px; --rs:10px; --rx:6px;
+  --sh1:0 1px 4px rgba(60,80,180,.06),0 2px 12px rgba(60,80,180,.04);
+  --sh2:0 4px 24px rgba(60,80,180,.10),0 1px 4px rgba(60,80,180,.06);
+  --sh3:0 8px 40px rgba(60,80,180,.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+button,select,input,textarea{font-family:'Noto Sans KR',sans-serif;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#6c7fff 0%,#a78bfa 40%,#f0abfc 78%,#fbbf92 100%);padding:34px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='700' height='340' viewBox='0 0 700 340' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='560' cy='70' rx='260' ry='160' fill='rgba(255,255,255,0.10)'/%3E%3Cellipse cx='90' cy='280' rx='200' ry='110' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E") no-repeat center/cover;pointer-events:none;}
+.hero-in{position:relative;max-width:1280px;margin:0 auto;}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.38);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;color:#fff;letter-spacing:.5px;margin-bottom:10px;}
+.hero-title{font-family:'Noto Sans KR',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:900;color:#fff;line-height:1.35;text-shadow:0 2px 16px rgba(0,0,60,.15);}
+.hero-sub{margin-top:6px;font-size:12.5px;color:rgba(255,255,255,.85);line-height:1.65;}
+.hero-sub em{font-style:normal;font-weight:600;color:#fff;}
+.hero-acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+/* hero buttons */
+.hbtn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--rs);border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.18);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.hbtn:hover{background:rgba(255,255,255,.32);border-color:rgba(255,255,255,.48);}
+.hbtn-solid{background:#fff;color:var(--accent);border-color:#fff;font-weight:700;box-shadow:0 2px 12px rgba(0,0,0,.12);}
+.hbtn-solid:hover{background:#f0f0ff;}
+.admin-ind{display:none;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.38);font-size:11px;font-weight:600;color:#fff;}
+.admin-ind.on{display:flex;}
+/* legend */
+.lgbar{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;}
+.lpill{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;cursor:pointer;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1.5px solid transparent;color:#fff;font-size:12px;font-weight:500;transition:all .2s;}
+.lpill:hover{background:rgba(255,255,255,.3);}
+.lpill.on{background:#fff;border-color:transparent;}
+.lpill.on.lp1{color:var(--lv1-c);}
+.lpill.on.lp2{color:var(--lv2-c);}
+.lpill.on.lp3{color:var(--lv3-c);}
+.ldot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.lp1 .ldot{background:#93c5fd;} .lp2 .ldot{background:#6ee7b7;} .lp3 .ldot{background:#fcd34d;}
+.lcnt{font-size:10px;opacity:.75;font-weight:500;}
+
+/* ── FILTER PANEL ── */
+.fpanel{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:var(--sh1);max-width:100%;margin:0;padding:12px 40px 11px;}
+.frow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.flabel{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;flex-shrink:0;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.chip{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.chip:hover{border-color:var(--accent);color:var(--accent);}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+/* date dropdown */
+.ddwrap{display:flex;align-items:center;gap:7px;}
+.ddlabel{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;white-space:nowrap;}
+.dds{padding:6px 30px 6px 12px;border-radius:var(--rx);border:1.5px solid var(--border2);background:var(--surface);color:var(--text);font-size:12px;font-weight:500;outline:none;cursor:pointer;transition:border-color .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%239aa0bc' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.dds:focus{border-color:var(--accent);}
+.dds.sel{border-color:var(--accent);color:var(--accent);font-weight:600;}
+/* search */
+.swrap{position:relative;margin-left:auto;}
+.sicon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none;}
+.sinput{padding:6px 14px 6px 30px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;outline:none;width:200px;transition:all .2s;}
+.sinput:focus{border-color:var(--accent);background:var(--surface);width:230px;}
+.sinput::placeholder{color:var(--muted);}
+
+/* stats */
+.stats{display:flex;align-items:center;gap:16px;padding:10px 40px;border-bottom:1px solid var(--border);background:var(--bg);font-size:12px;color:var(--muted);}
+.snum{font-weight:700;color:var(--accent);}
+
+/* level cards */
+.lvcards{max-width:1280px;margin:24px auto 0;padding:0 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.lvcard{background:var(--surface);border-radius:var(--r);border:1.5px solid var(--border);padding:18px 20px;box-shadow:var(--sh1);transition:box-shadow .2s,transform .2s;}
+.lvcard:hover{box-shadow:var(--sh2);transform:translateY(-2px);}
+.lvcard.lv1{border-top:3px solid var(--lv1-c);}
+.lvcard.lv2{border-top:3px solid var(--lv2-c);}
+.lvcard.lv3{border-top:3px solid var(--lv3-c);}
+.lcs{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.lv1 .lcs{color:var(--lv1-c);} .lv2 .lcs{color:var(--lv2-c);} .lv3 .lcs{color:var(--lv3-c);}
+.lcn{font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.lce{font-size:10px;color:var(--muted);margin-bottom:8px;font-weight:500;}
+.lcb{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:6px;}
+.lv1 .lcb{background:var(--lv1-bb);color:var(--lv1-bt);} .lv2 .lcb{background:var(--lv2-bb);color:var(--lv2-bt);} .lv3 .lcb{background:var(--lv3-bb);color:var(--lv3-bt);}
+.lcd{font-size:11px;color:var(--sub);line-height:1.65;}
+.lck{margin-top:8px;font-size:10px;font-weight:600;color:var(--muted);}
+
+/* main */
+main{max-width:1280px;margin:0 auto;padding:26px 40px 60px;}
+.ssec{margin-bottom:40px;}
+.shdr{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid var(--border);}
+.sicon{font-size:20px;}
+.sname{font-family:'Noto Sans KR',sans-serif;font-size:17px;font-weight:700;color:var(--text);}
+.scnt{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:10px;font-weight:500;}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+
+/* question card */
+.qcard{background:var(--surface);border-radius:var(--r);border:1.5px solid var(--border);box-shadow:var(--sh1);padding:18px 20px;transition:all .22s;animation:fup .3s ease both;position:relative;}
+@keyframes fup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qcard:hover{box-shadow:var(--sh2);transform:translateY(-3px);}
+.qcard.lv1{border-left:3px solid var(--lv1-c);}
+.qcard.lv2{border-left:3px solid var(--lv2-c);}
+.qcard.lv3{border-left:3px solid var(--lv3-c);}
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;}
+.lbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0;cursor:help;}
+.lv1 .lbadge{background:var(--lv1-bb);color:var(--lv1-bt);}
+.lv2 .lbadge{background:var(--lv2-bb);color:var(--lv2-bt);}
+.lv3 .lbadge{background:var(--lv3-bb);color:var(--lv3-bt);}
+.cmeta{display:flex;align-items:center;gap:6px;}
+.cnum{font-size:10px;color:var(--muted);font-weight:500;}
+.cadmbts{display:flex;gap:3px;}
+.icbtn{background:none;border:none;padding:3px 5px;border-radius:4px;font-size:13px;opacity:.4;transition:opacity .15s;cursor:pointer;}
+.icbtn:hover{opacity:1;}
+.qtxt{font-size:13.5px;font-weight:500;line-height:1.7;color:var(--text);margin-bottom:14px;}
+
+/* keyword section */
+.kwsec{margin-bottom:10px;}
+.kwhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.kwlabel{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.cpbtn{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 9px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .15s;}
+.cpbtn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lt);}
+.cpbtn.cp{border-color:#16a34a;color:#16a34a;background:#f0fff4;}
+.kwtags{display:flex;flex-wrap:wrap;gap:5px;}
+.kwtag{position:relative;display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--rx);font-size:11px;cursor:pointer;transition:opacity .15s;font-weight:500;}
+.kwtag:hover{opacity:.72;}
+.lv1 .kwtag{background:var(--lv1-tg);color:var(--lv1-bt);}
+.lv2 .kwtag{background:var(--lv2-tg);color:var(--lv2-bt);}
+.lv3 .kwtag{background:var(--lv3-tg);color:var(--lv3-bt);}
+
+.cdatechip{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:var(--rx);margin-top:8px;font-weight:500;}
+.darow{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.dalabel{font-size:10px;color:var(--muted);}
+.dainput{padding:3px 10px;border-radius:var(--rx);border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:11px;outline:none;width:145px;}
+.dainput:focus{border-color:var(--accent);}
+
+/* 03 - KEYWORD TOOLTIP: sky blue tone */
+.gtip{display:none;position:fixed;z-index:9999;background:#e0f2fe;color:#0c4a6e;border:1px solid #bae6fd;border-radius:var(--rs);padding:12px 15px;font-size:11px;line-height:1.65;box-shadow:0 8px 32px rgba(14,116,144,.18);pointer-events:none;min-width:220px;max-width:280px;}
+.gtip strong{display:block;color:#0369a1;font-size:12px;margin-bottom:5px;font-weight:700;}
+
+/* modals */
+.ov{display:none;position:fixed;inset:0;background:rgba(15,20,50,.4);backdrop-filter:blur(6px);z-index:400;align-items:center;justify-content:center;}
+.ov.op{display:flex;}
+.modal{background:var(--surface);border-radius:20px;box-shadow:var(--sh3);border:1px solid var(--border);padding:28px 30px;width:min(520px,94vw);max-height:90vh;overflow-y:auto;}
+.mtitle{font-family:'Noto Sans KR',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:20px;}
+.fg{margin-bottom:15px;}
+.flbl{display:block;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.fi,.fs,.fta{width:100%;padding:9px 13px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rx);color:var(--text);font-size:13px;outline:none;transition:border-color .2s;}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--accent);background:var(--surface);}
+.fta{resize:vertical;min-height:78px;}
+.fhint{font-size:10px;color:var(--muted);margin-top:4px;}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mfoot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+/* surface buttons */
+.sb{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--rx);border:1.5px solid var(--border2);background:var(--surface);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.sb:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lt);}
+.sb-acc{background:var(--accent);color:#fff;border-color:var(--accent);}
+.sb-acc:hover{background:var(--accent-dk);border-color:var(--accent-dk);}
+.sb-red{color:#dc2626;border-color:#fecaca;}
+.sb-red:hover{background:#fff5f5;}
+.sb-green{color:#16a34a;border-color:#bbf7d0;}
+.sb-green:hover{background:#f0fff4;}
+.sb-sm{padding:4px 10px;font-size:11px;}
+/* pin */
+.pinf{width:100%;padding:16px;font-size:28px;letter-spacing:18px;text-align:center;background:var(--surface2);border:2px solid var(--border2);border-radius:var(--rs);color:var(--accent);outline:none;transition:border-color .2s;margin:16px 0;}
+.pinf:focus{border-color:var(--accent);background:var(--surface);}
+.pinerr{font-size:12px;color:#dc2626;text-align:center;height:18px;}
+/* sys row */
+.sysrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.sysrow:last-child{border-bottom:none;}
+/* empty */
+.empty{text-align:center;padding:60px 24px;color:var(--muted);grid-column:1/-1;}
+.empty-ico{font-size:48px;margin-bottom:12px;}
+.empty-t{font-size:16px;color:var(--sub);margin-bottom:6px;}
+/* scroll btn */
+#stb{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:18px;cursor:pointer;box-shadow:0 4px 16px rgba(91,108,249,.38);opacity:0;transition:opacity .3s,transform .2s;z-index:99;}
+#stb.on{opacity:1;}
+#stb:hover{transform:scale(1.1);}
+
+mark{background:rgba(91,108,249,.15);color:var(--accent-dk);border-radius:2px;padding:0 2px;}
+
+@media(max-width:768px){
+  .hero{padding:22px 18px 28px;}
+  .fpanel{padding:10px 16px 9px;}
+  .stats,.lvcards,main{padding-left:16px;padding-right:16px;}
+  .lvcards{grid-template-columns:1fr;}
+  .frow2{grid-template-columns:1fr;}
+  .sinput{width:100%;}
+  .cgrid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-in">
+    <div class="hero-top">
+      <div>
+        <div class="hero-label">🎓 공동교육과정 · 인체구조와 기능</div>
+        <h1 class="hero-title">핵심질문 메뉴판</h1>
+        <p class="hero-sub">모두가 답해야 할 숙제가 아니라 <em>'나만의 연구 주제를 고르는 메뉴판'</em></p>
+      </div>
+      <div class="hero-acts">
+        <div class="admin-ind" id="admInd">🔓 관리 모드</div>
+        <button class="hbtn" id="sysBtn" onclick="openSysModal()" style="display:none">🗂️ 계통 관리</button>
+        <button class="hbtn" id="xlsBtn" onclick="exportCsv()" style="display:none">📥 엑셀 저장</button>
+        <button class="hbtn" id="resetBtn" onclick="resetFilters()" style="display:none">↺ 초기화</button>
+        <button class="hbtn hbtn-solid" id="admBtn" onclick="toggleAdmin()">⚙️ 관리 모드</button>
+      </div>
+    </div>
+    <div class="lgbar">
+      <button class="lpill lp1" onclick="setLv(1)" id="leg1"><span class="ldot"></span><span>1단계 · 개념의 구조화</span><span class="lcnt" id="lc1"></span></button>
+      <button class="lpill lp2" onclick="setLv(2)" id="leg2"><span class="ldot"></span><span>2단계 · 메커니즘 인사이트</span><span class="lcnt" id="lc2"></span></button>
+      <button class="lpill lp3" onclick="setLv(3)" id="leg3"><span class="ldot"></span><span>3단계 · 융합적 문제해결</span><span class="lcnt" id="lc3"></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- FILTER PANEL – sits flush below hero, no overlap -->
+<div class="fpanel">
+  <div class="frow">
+    <span class="flabel">계통</span>
+    <div class="chips" id="sysChips"></div>
+    <div class="ddwrap">
+      <span class="ddlabel">수업날짜</span>
+      <select class="dds" id="dateDd" onchange="onDateChange(this)">
+        <option value="">전체 날짜</option>
+      </select>
+    </div>
+    <div class="swrap">
+      <span class="sicon">🔍</span>
+      <input class="sinput" id="srch" type="text" placeholder="질문 · 키워드 검색…" oninput="doFilter()">
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <span><span class="snum" id="vcnt">0</span> 개 질문 표시 중</span>
+  <span>전체 <span class="snum" id="tcnt">0</span> 개</span>
+</div>
+
+<!-- LEVEL CARDS -->
+<div class="lvcards">
+  <div class="lvcard lv1">
+    <div class="lcs">1단계</div><div class="lcn">개념의 구조화</div><div class="lce">Concept Mapping</div>
+    <span class="lcb">Bloom: 기억(Remember) + 이해(Understand)</span>
+    <p class="lcd">인체 시스템의 핵심 해부학적 구조와 생리학적 정의를 정확히 이해하고 정리함. "~은 무엇인가?", "~은 어떻게 이루어지나?" 형태의 질문.</p>
+    <div class="lck">📌 평가역량: 기초 지식 습득 및 정리 능력</div>
+  </div>
+  <div class="lvcard lv2">
+    <div class="lcs">2단계</div><div class="lcn">메커니즘 인사이트</div><div class="lce">Mechanism Insight</div>
+    <span class="lcb">Bloom: 적용(Apply) + 분석(Analyze)</span>
+    <p class="lcd">질환 발생 경로, 약물 작용 원리, 증상 발현의 인과관계를 논리적 흐름도(Flowchart)로 시각화·분석함. "~이 나타나는 이유는?", "~는 어떻게 작용할까?"</p>
+    <div class="lck">📌 평가역량: 인과관계 추론 및 시스템적 사고</div>
+  </div>
+  <div class="lvcard lv3">
+    <div class="lcs">3단계</div><div class="lcn">융합적 문제해결</div><div class="lce">Health Consulting</div>
+    <span class="lcb">Bloom: 평가(Evaluate) + 창조(Create)</span>
+    <p class="lcd">질병/사례를 분석하여 예방 및 중재 방안을 제안하거나 최신 의학 기술, 진로 등과 연결함. "~을 어떻게 예방할까?", "패러다임은 어떻게 변화되었나?"</p>
+    <div class="lck">📌 평가역량: 비판적 사고 및 진로 역량</div>
+  </div>
+</div>
+
+<main id="main"></main>
+<button id="stb" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- Global tooltips: fixed position, never clipped -->
+<div class="gtip" id="bloomTip"></div>
+<div class="gtip" id="kwTip"></div>
+
+<!-- PIN MODAL -->
+<div class="ov" id="pinOv">
+  <div class="modal" style="max-width:320px">
+    <div class="mtitle">🔐 관리자 인증</div>
+    <p style="font-size:12px;color:var(--muted)">PIN 번호 4자리를 입력하세요.</p>
+    <input class="pinf" id="pinIn" type="password" maxlength="4" inputmode="numeric" placeholder="····" autocomplete="off" oninput="onPin()" onkeydown="if(event.key==='Enter')doPin()">
+    <div class="pinerr" id="pinErr"></div>
+    <div class="mfoot"><button class="sb" onclick="closePinOv()">취소</button><button class="sb sb-acc" onclick="doPin()">확인</button></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="ov" id="editOv">
+  <div class="modal">
+    <div class="mtitle" id="editTitle">핵심질문 추가</div>
+    <input type="hidden" id="eid">
+    <div class="frow2">
+      <div class="fg"><label class="flbl">신체 계통</label><select class="fs" id="eSys" onchange="onSysChg()"></select></div>
+      <div class="fg"><label class="flbl">질문 단계</label><select class="fs" id="eLv"><option value="1">1단계 · 개념의 구조화</option><option value="2">2단계 · 메커니즘 인사이트</option><option value="3">3단계 · 융합적 문제해결</option></select></div>
+    </div>
+    <div class="fg" id="newSysG" style="display:none"><label class="flbl">새 신체 계통 이름</label><input class="fi" type="text" id="newSysIn" placeholder="예: 호흡계"></div>
+    <div class="fg"><label class="flbl">수업 날짜 (선택)</label><input class="fi" type="date" id="eDate"><div class="fhint">날짜 지정 시 드롭다운으로 학생이 날짜별 조회 가능</div></div>
+    <div class="fg"><label class="flbl">핵심 질문</label><textarea class="fta" id="eQ" placeholder="질문을 입력하세요…"></textarea></div>
+    <div class="fg"><label class="flbl">핵심 키워드 (쉼표 구분)</label><input class="fi" type="text" id="eKw" placeholder="예: 알부민, 삼투압, 간"></div>
+    <div class="fg"><label class="flbl">키워드 부연설명 (키워드|설명, 줄바꿈 구분)</label><textarea class="fta" id="eKwD" placeholder="알부민|혈장 단백질로 삼투압 유지에 핵심 역할&#10;삼투압|용질 농도 차이로 물이 이동하는 압력"></textarea><div class="fhint">키워드에 마우스를 올리면 팝업 설명이 표시됩니다.</div></div>
+    <div class="mfoot"><button class="sb" onclick="closeEditOv()">취소</button><button class="sb sb-acc" onclick="saveQ()">저장</button></div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="ov" id="delOv">
+  <div class="modal" style="max-width:320px">
+    <div class="mtitle">질문 삭제</div>
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 18px">이 질문을 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
+    <div class="mfoot"><button class="sb" onclick="closeDelOv()">취소</button><button class="sb sb-red" onclick="doDelete()">삭제</button></div>
+  </div>
+</div>
+
+<!-- SYSTEM MODAL -->
+<div class="ov" id="sysOv">
+  <div class="modal" style="max-width:380px">
+    <div class="mtitle">🗂️ 신체계통 관리</div>
+    <div id="sysList" style="margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px"><input class="fi" type="text" id="newSysN" placeholder="새 계통 이름 입력" style="flex:1"><button class="sb sb-acc" onclick="addSys()">추가</button></div>
+    <div class="mfoot"><button class="sb sb-acc" onclick="closeSysOv()">닫기</button></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════
+// KW DESCRIPTIONS
+// ══════════════════════
+const KWD={
+  '세포적응':'세포가 환경 변화에 반응해 구조·기능을 변화시키는 과정',
+  '비대':'세포 크기가 커지는 것 (예: 운동 후 근육세포)',
+  '증식':'세포 수가 늘어나는 것',
+  '위축':'영양 부족·사용 감소로 세포 크기가 줄어드는 것',
+  '화생':'한 분화 세포형이 다른 유형으로 바뀌는 것',
+  '이형성':'세포의 크기·모양·배열이 비정상적으로 변하는 전암 상태',
+  '배아줄기세포':'수정란에서 유래, 모든 세포로 분화 가능 (전능성)',
+  '성체줄기세포':'성인 조직에 존재, 해당 조직 세포로 분화',
+  '유도만능줄기세포':'체세포에 유전자를 도입해 줄기세포로 역분화 (iPSC)',
+  '알부민':'간에서 생성되는 혈장 단백질; 혈액 삼투압 유지의 핵심',
+  'EPO':'신장에서 생성되는 호르몬; 적혈구 생성을 촉진함',
+  '철결핍성빈혈':'철분 부족으로 헤모글로빈 합성이 감소하는 빈혈',
+  '내인자':'위에서 분비되는 당단백질; 비타민 B12 흡수에 필수',
+  '비결합빌리루빈':'간에서 처리되기 전의 빌리루빈; 지용성으로 독성 있음',
+  '결합빌리루빈':'간에서 포합된 수용성 빌리루빈; 담즙으로 배설됨',
+  '혈소판':'지혈에 관여하는 혈액 세포 조각; 1차 지혈 담당',
+  '응고인자':'혈액 응고 반응에 관여하는 단백질들 (Ⅰ~ⅩⅢ)',
+  '피브린':'트롬빈에 의해 형성되는 불용성 단백질; 혈전의 그물망 형성',
+  '항혈소판':'혈소판 응집을 억제하는 약물 효과 (예: 아스피린)',
+  '트롬복산A2':'혈소판에서 생성; 혈소판 응집 및 혈관 수축 촉진',
+  'COX-1':'위 점막 보호 프로스타글란딘 생성에 관여하는 효소',
+  'COX-2':'염증 반응에서 프로스타글란딘 생성에 관여하는 효소',
+  '프로스타글란딘':'COX에 의해 생성; 염증·통증·발열 및 위 보호 역할',
+  '항트롬빈':'트롬빈을 억제하는 체내 단백질; 헤파린이 활성 촉진',
+  'HIV':'인간면역결핍바이러스; helper T cell(CD4+)을 파괴',
+  '체액성면역':'B림프구가 항체를 생성해 항원을 제거하는 면역 반응',
+  '세포성면역':'T림프구가 직접 감염 세포를 제거하는 면역 반응',
+  '뉴클레오캡시드':'바이러스의 핵산과 단백질 껍질 복합체; 진단 키트의 표적',
+  '1차 면역반응':'처음 항원에 노출될 때의 느리고 약한 면역 반응',
+  '2차 면역반응':'재노출 시 기억세포에 의한 빠르고 강한 면역 반응',
+  '비만세포':'조직에 분포; IgE 결합 후 히스타민 방출하여 알레르기 유발',
+  'IgE':'알레르기 반응에서 핵심적인 항체; 비만세포에 결합',
+  '히스타민':'알레르기 증상(가려움·부종·혈관확장)을 유발하는 화학 매체',
+  'H1수용체':'히스타민이 결합해 알레르기 증상을 일으키는 수용체',
+  '뇌혈관장벽(BBB)':'뇌로 들어오는 물질을 선택적으로 차단하는 보호 장벽',
+  '에피네프린':'아드레날린이라고도 함; 아나필락시스 응급처치 약물',
+  '관상동맥':'심장 근육에 혈액을 공급하는 동맥; 협심증·심근경색의 원인',
+  '죽상경화증':'혈관 내벽에 지방 플라크가 쌓여 혈관이 좁아지는 질환',
+  'HMG CoA 환원효소':'간에서 콜레스테롤 합성의 속도 결정 효소; 스타틴의 표적',
+  'PCSK-9':'LDL 수용체를 분해하는 단백질; 억제 시 LDL 제거 증가',
+  'LDL수용체':'간세포 표면에서 혈중 LDL을 흡수하는 수용체',
+  '전부하(정맥환류량)':'심장으로 돌아오는 혈액량; NTG는 이를 줄여 심장 부담 감소',
+  '압력수용체':'경동맥·대동맥궁의 혈압 감지 센서; 자율신경을 통해 혈압 조절',
+  '레닌':'신장에서 분비; RAAS 연쇄 반응의 첫 단계 효소',
+  '안지오텐신II':'강력한 혈관 수축 + 알도스테론 분비 촉진 → 혈압 상승',
+  '알도스테론':'부신피질 호르몬; Na⁺ 재흡수 촉진 → 혈압·혈량 증가',
+  '간문맥':'소화관에서 흡수된 물질을 간으로 운반하는 혈관',
+  '동방결절(SA node)':'심장의 박동조율기; 전기 신호를 자율적으로 발생',
+  '방실결절(AV node)':'SA node 신호를 심실로 전달; 방실 지연으로 심실 충전 보장',
+  '심실빈맥(V-tach)':'심실에서 빠르고 규칙적인 비정상 리듬; 심장마비 위험',
+  '심실세동(V-fib)':'심실이 무질서하게 떨리는 상태; 즉각적 제세동 필요',
+  '난원공':'태아 심방 사이의 구멍; 출생 후 닫힘',
+  '동맥관':'태아 폐동맥과 대동맥을 연결; 출생 후 닫힘',
+  '다뇨':'혈당이 높아 소변량이 늘어나는 당뇨 증상',
+  '다음':'세포 탈수로 인한 심한 갈증',
+  '공복혈당':'8시간 이상 금식 후 측정한 혈당; 126mg/dL 이상이면 당뇨',
+  '당화혈색소(HbA1C)':'2~3개월 평균 혈당을 반영; 6.5% 이상이면 당뇨',
+  '인슐린저항성':'세포가 인슐린에 반응을 잘 못하는 상태; 2형 당뇨의 원인',
+  '렙틴저항성':'포만감 호르몬인 렙틴이 제대로 작용하지 못하는 상태',
+  'GLP-1 작용제':'인크레틴 유사체; 인슐린 분비 촉진·식욕 억제 (예: 오젬픽)',
+  'DPP-4억제제':'GLP-1을 분해하는 효소를 억제해 혈당 조절',
+  'SGLT-2억제제':'신장에서 포도당 재흡수를 막아 소변으로 배출 촉진',
+  'TRH':'시상하부에서 분비; 뇌하수체 TSH 분비를 자극',
+  'TSH':'뇌하수체에서 분비; 갑상선 호르몬(T3·T4) 합성·분비 촉진',
+  '음성피드백':'호르몬 분비가 과다할 때 상위 조절 호르몬을 억제하는 조절 기전',
+  '골흡수':'파골세포가 뼈를 분해해 칼슘을 혈액으로 방출하는 과정',
+  '고칼슘혈증':'혈중 칼슘 과다; 신결석·근력저하·의식변화 유발',
+  '저칼슘혈증':'혈중 칼슘 부족; 근육 과흥분(테타니) 유발',
+  '항이뇨호르몬':'ADH; 신장에서 수분 재흡수 촉진 → 소변량 감소',
+  '저나트륨혈증':'혈중 나트륨 부족; 삼투압 저하로 세포 부종 유발',
+  '항염증':'염증 반응의 화학 매개체 생성을 억제하는 효과',
+  '포스포리파아제A2':'세포막 인지질을 아라키돈산으로 분해하는 효소; 스테로이드가 억제',
+  '아라키돈산 연쇄반응':'아라키돈산→COX/LOX→프로스타글란딘·류코트리엔 생성 경로',
+};
+
+// ══════════════════════
+// DATA
+// ══════════════════════
+const DQ=[
+  {id:'q001',num:1,level:3,system:'혈액·면역계',question:'상피세포가 스트레스를 받는다면?',keywords:['세포적응','비대','증식','위축','화생','이형성'],kwDesc:{},date:''},
+  {id:'q002',num:2,level:3,system:'혈액·면역계',question:'줄기세포는 어떤 것이 있을까?',keywords:['배아줄기세포','성체줄기세포','유도만능줄기세포'],kwDesc:{},date:''},
+  {id:'q003',num:3,level:2,system:'혈액·면역계',question:'신장, 간이 망가지면 몸이 붓는 이유는?',keywords:['알부민'],kwDesc:{},date:''},
+  {id:'q004',num:4,level:2,system:'혈액·면역계',question:'신장이 망가지면 빈혈이 나타날 수 있을까?',keywords:['EPO'],kwDesc:{},date:''},
+  {id:'q005',num:5,level:2,system:'혈액·면역계',question:'위절제술, 위산변화가 빈혈을 일으키는 이유는?',keywords:['철결핍성빈혈','위산(염산)','비타민B12결핍성 빈혈','내인자'],kwDesc:{},date:''},
+  {id:'q006',num:6,level:2,system:'혈액·면역계',question:'간이 나빠지면 황달이 나타나는 이유는?',keywords:['적혈구파괴','비결합빌리루빈','결합빌리루빈'],kwDesc:{},date:''},
+  {id:'q007',num:7,level:1,system:'혈액·면역계',question:'출혈 시 지혈은 어떻게 이루어질까?',keywords:['1차 지혈','혈소판','2차 지혈','응고인자','프로트롬빈','트롬빈','피브리노겐','피브린'],kwDesc:{},date:''},
+  {id:'q008',num:8,level:3,system:'혈액·면역계',question:'아스피린은 어떻게 작용할까?',keywords:['항혈소판','트롬복산A2'],kwDesc:{},date:''},
+  {id:'q009',num:9,level:3,system:'혈액·면역계',question:'NSAIDs는 왜 위보호제와 함께 처방될까?',keywords:['아라키돈산 연쇄반응','COX-1','COX-2','프로스타글란딘'],kwDesc:{},date:''},
+  {id:'q010',num:10,level:3,system:'혈액·면역계',question:'헤파린과 와파린은 어떻게 혈전형성을 예방할까?',keywords:['항트롬빈','비타민K의존 응고인자'],kwDesc:{},date:''},
+  {id:'q011',num:11,level:1,system:'혈액·면역계',question:'바이러스, 세균 등 외부 물질이 침입했을때 우리 몸은 어떻게 대응할까?',keywords:['비특이적 면역반응','특이적 면역반응','호중구','대식세포','B림프구','T림프구'],kwDesc:{},date:''},
+  {id:'q012',num:12,level:2,system:'혈액·면역계',question:'코로나19 자가진단 키트는 어떤 원리로 코로나19 바이러스를 검출해낼까?',keywords:['뉴클레오캡시드','항원-항체반응'],kwDesc:{},date:''},
+  {id:'q013',num:13,level:2,system:'혈액·면역계',question:'HIV는 어떻게 인간의 면역을 떨어뜨릴까?',keywords:['HIV','AIDS','helper T cell','B림프구','항체','대식세포','체액성면역','세포성면역'],kwDesc:{},date:''},
+  {id:'q014',num:14,level:2,system:'혈액·면역계',question:'백신은 어떻게 감염병을 예방할까?',keywords:['1차 면역반응','2차 면역반응'],kwDesc:{},date:''},
+  {id:'q015',num:15,level:3,system:'혈액·면역계',question:'코로나19 이후 백신 제작의 패러다임은 어떻게 변화되었을까?',keywords:['RNA백신','DNA백신','바이러스 벡터 백신'],kwDesc:{},date:''},
+  {id:'q016',num:16,level:3,system:'혈액·면역계',question:'가벼운 알레르기부터 심각한 아나필락시스 쇼크까지 알레르기 반응은 왜 나타나는 걸까?',keywords:['비만세포','IgE','히스타민'],kwDesc:{},date:''},
+  {id:'q017',num:17,level:3,system:'혈액·면역계',question:'항히스타민제는 어떻게 알레르기 증상을 완화시키고 부작용은 무엇일까?',keywords:['히스타민','H1수용체','뇌혈관장벽(BBB)','콜린성수용체','아드레날린수용체'],kwDesc:{},date:''},
+  {id:'q018',num:18,level:3,system:'혈액·면역계',question:'아나필락틱 쇼크 응급처치는 어떻게 할 수 있고, 응급처치에 사용되는 약물은 어떤 효과를 가질까?',keywords:['에피네프린','에피펜 사용법'],kwDesc:{},date:''},
+  {id:'q019',num:19,level:1,system:'순환계',question:'심장박동이 가장 크게 들리는 부위는 어디일까?',keywords:['심첨부','좌측쇄골중앙선','5~6번째 갈비뼈','이첨판(승모판)'],kwDesc:{},date:''},
+  {id:'q020',num:20,level:1,system:'순환계',question:'종격동은 무엇일까?',keywords:['체강(body cavity)','흉강'],kwDesc:{},date:''},
+  {id:'q021',num:21,level:1,system:'순환계',question:'협심증과 심근경색은 어떻게 다를까?',keywords:['관상동맥'],kwDesc:{},date:''},
+  {id:'q022',num:22,level:1,system:'순환계',question:'LDL 콜레스테롤이 나쁜 이유는 무엇일까?',keywords:['잉여LDL','혈관벽 산화','거품세포','죽상경화증'],kwDesc:{},date:''},
+  {id:'q023',num:23,level:1,system:'순환계',question:'HDL콜레스테롤이 착한 콜레스테롤이라고 불리는 이유는 무엇일까?',keywords:['청소부역할','간'],kwDesc:{},date:''},
+  {id:'q024',num:24,level:2,system:'순환계',question:'고지혈증 치료제로 스타틴 계열의 약물과 PCSK-9 억제제는 어떻게 콜레스테롤 수치를 떨어뜨릴까?',keywords:['HMG CoA 환원효소','PCSK-9','단백질분해효소','LDL수용체'],kwDesc:{},date:''},
+  {id:'q025',num:25,level:3,system:'순환계',question:'콜레스테롤 수치를 낮추기 위해서는 어떻게 해야 할까요?',keywords:['탄수화물','알코올','지방'],kwDesc:{},date:''},
+  {id:'q026',num:26,level:2,system:'순환계',question:'니트로글리세린(NTG)은 어떻게 협심증 증상을 완화할까요?',keywords:['관상동맥','정맥혈관 확장','말초혈관 저항','전부하(정맥환류량)','심장부담'],kwDesc:{},date:''},
+  {id:'q027',num:27,level:3,system:'순환계',question:'교감신경은 어떻게 혈압을 조절하나요?',keywords:['압력수용체','경동맥','대동맥궁','연수','교감신경','에피네프린','베타1수용체'],kwDesc:{},date:''},
+  {id:'q028',num:28,level:3,system:'순환계',question:'RAAS는 어떻게 혈압을 높이나요?',keywords:['레닌','안지오텐시노겐','안지오텐신I','안지오텐신II','안지오텐신전환효소(ACE)','알도스테론'],kwDesc:{},date:''},
+  {id:'q029',num:29,level:1,system:'순환계',question:'심장은 어떻게 산소가 가득한 혈액을 온몸으로 순환시킬 수 있을까?',keywords:['체순환','폐순환'],kwDesc:{},date:''},
+  {id:'q030',num:30,level:2,system:'순환계',question:'간경화 환자에게 식도정맥류가 자주 발생하는 이유는?',keywords:['간문맥','소장','대장','비장','위','식도'],kwDesc:{},date:''},
+  {id:'q031',num:31,level:2,system:'순환계',question:'간경화 환자에게 복수가 차는 이유는?',keywords:['간문맥','정수압','알부민'],kwDesc:{},date:''},
+  {id:'q032',num:32,level:3,system:'순환계',question:'간이 망가지면 어떤 증상들이 나타날 수 있을까?',keywords:['탄수화물대사','단백질대사','지방대사','빌리루빈 대사'],kwDesc:{},date:''},
+  {id:'q033',num:33,level:1,system:'순환계',question:'심장은 어떻게 자율적으로 박동하고 효율적으로 혈액을 순환시킬 수 있을까?',keywords:['동방결절(SA node)','방실결절(AV node)','방실지연'],kwDesc:{},date:''},
+  {id:'q034',num:34,level:1,system:'순환계',question:'심정지를 의심할 수 있는 대표적인 심장리듬은 어떤 것이고 어떤 파형을 보일까?',keywords:['심실빈맥(V-tach)','심실세동(V-fib)'],kwDesc:{},date:''},
+  {id:'q035',num:35,level:3,system:'순환계',question:'엄마 뱃속의 아기의 심장이 특별한 이유는 무엇일까?',keywords:['난원공','동맥관','폐순환'],kwDesc:{},date:''},
+  {id:'q036',num:36,level:1,system:'내분비계',question:'당뇨병을 의심할 수 있는 주요증상과 그 이유는 무엇일까?',keywords:['다뇨','다음','급격한 체중감소'],kwDesc:{},date:''},
+  {id:'q037',num:37,level:1,system:'내분비계',question:'당뇨병은 어떻게 진단할 수 있을까?',keywords:['공복혈당','당화혈색소(HbA1C)'],kwDesc:{},date:''},
+  {id:'q038',num:38,level:1,system:'내분비계',question:'저혈당 응급처치 방법은 무엇일까?',keywords:['포도당 15g','초콜릿','우유','15분','무의식'],kwDesc:{},date:''},
+  {id:'q039',num:39,level:1,system:'내분비계',question:'당뇨병은 어떻게 발병하게 될까?',keywords:['과식','인슐린저항성','렙틴저항성','췌장기능','인슐린 수용체 민감도'],kwDesc:{},date:''},
+  {id:'q040',num:40,level:3,system:'내분비계',question:'액상과당의 과다한 섭취가 일으킬 수 있는 문제는 무엇일까?',keywords:['포도당과 다른 대사과정','간','인슐린분비','지방','렙틴호르몬','비만'],kwDesc:{},date:''},
+  {id:'q041',num:41,level:3,system:'내분비계',question:'제로슈가가 몸에 미치는 영향은 무엇인가요?',keywords:['장내 미생물','당섭취욕구','인슐린 분비'],kwDesc:{},date:''},
+  {id:'q042',num:42,level:1,system:'내분비계',question:'당뇨병의 급성·만성 합병증은 무엇인가요?',keywords:['고혈당성 삼투성 혼수','케톤산 혈증','만성합병증(눈·신경·신장)'],kwDesc:{},date:''},
+  {id:'q043',num:43,level:3,system:'내분비계',question:'당뇨병 예방 방법은 무엇이 있을까?',keywords:['식사요법','운동요법'],kwDesc:{},date:''},
+  {id:'q044',num:44,level:3,system:'내분비계',question:'경구용 당뇨치료제(아마릴, 메트포르민)는 어떻게 혈당을 낮출까?',keywords:['설파닐우레아','췌장자극','구아니딘','간','포도당 합성'],kwDesc:{},date:''},
+  {id:'q045',num:45,level:3,system:'내분비계',question:'최신 당뇨병 치료제는 어떤 기전을 활용해서 혈당을 조절하나요?',keywords:['GLP-1 작용제','인크레틴','DPP-4억제제','SGLT-2억제제'],kwDesc:{},date:''},
+  {id:'q046',num:46,level:1,system:'내분비계',question:'갑상선호르몬 분비는 어떻게 조절되나요?',keywords:['시상하부','뇌하수체전엽','갑상선','TRH','TSH','T3·T4','음성피드백'],kwDesc:{},date:''},
+  {id:'q047',num:47,level:1,system:'내분비계',question:'갑상선 호르몬은 어떤 기능을 할까?',keywords:['심장','근육','뼈','간','중추신경계','배란','열량 생산'],kwDesc:{},date:''},
+  {id:'q048',num:48,level:1,system:'내분비계',question:'부갑상선 호르몬은 어떤 기능을 할까?',keywords:['혈중칼슘','장관','신장','뼈'],kwDesc:{},date:''},
+  {id:'q049',num:49,level:2,system:'내분비계',question:'부갑상선 항진증이 골다공증을 일으키는 이유는?',keywords:['골흡수','골형성','혈중칼슘농도'],kwDesc:{},date:''},
+  {id:'q050',num:50,level:2,system:'내분비계',question:'부갑상선 항진증이 신장결석을 일으키는 이유는?',keywords:['고칼슘혈증','대사성산증','이온화된 칼슘'],kwDesc:{},date:''},
+  {id:'q051',num:51,level:2,system:'내분비계',question:'부갑상선 항진증에 근력저하가 나타나는 이유는?',keywords:['고칼슘혈증','막전위차 증가'],kwDesc:{},date:''},
+  {id:'q052',num:52,level:2,system:'내분비계',question:"부갑상선 항진증에 '테타니'가 나타나는 이유는 무엇이고, 테타니 증상을 진단할 수 있는 검진 방법은 무엇인가요?",keywords:['저칼슘혈증','막전위차 감소','트루소 징후','츠보스텍 징후'],kwDesc:{},date:''},
+  {id:'q053',num:53,level:2,system:'내분비계',question:'항이뇨호르몬 부적절분비 증후군에서 뇌부종이 나타나는 이유는?',keywords:['항이뇨호르몬','저나트륨혈증','레닌','알도스테론','삼투압'],kwDesc:{},date:''},
+  {id:'q054',num:54,level:3,system:'내분비계',question:'부신피질호르몬제(스테로이드제)의 효과와 작용 기전은?',keywords:['항염증','면역억제','포스포리파아제A2','아라키돈산 연쇄반응'],kwDesc:{},date:''},
+  {id:'q055',num:55,level:3,system:'내분비계',question:'부신피질호르몬제(스테로이드제)의 대표적인 부작용은?',keywords:['부신위기','기회감염','뼈','근육','지방','혈당'],kwDesc:{},date:''},
+];
+const BI={
+  1:{badge:'1단계 · Concept Mapping',bloom:'Bloom: 기억(Remember) + 이해(Understand)',desc:'"~은 무엇인가?", "~은 어떻게 이루어지나?" 형태로 사실·구조를 정확히 떠올리고 설명하는 질문.',e:'🔵'},
+  2:{badge:'2단계 · Mechanism Insight',bloom:'Bloom: 적용(Apply) + 분석(Analyze)',desc:'"~이 나타나는 이유는?", "~는 어떻게 작용하나?" 형태로 인과관계 흐름을 분석하는 질문.',e:'🟢'},
+  3:{badge:'3단계 · Health Consulting',bloom:'Bloom: 평가(Evaluate) + 창조(Create)',desc:'"~을 어떻게 예방할까?", "패러다임은 어떻게 변화되었나?" 형태로 판단·제안하는 질문.',e:'🟠'},
+};
+
+// ══════════════════════
+// STATE
+// ══════════════════════
+let Qs=[],custSys=[],admin=false,lvF=null,sysF=null,dateF=null,srchF='',delId=null,editId=null;
+const PIN='1234';
+
+function load(){
+  const q=localStorage.getItem('iq3');Qs=q?JSON.parse(q):JSON.parse(JSON.stringify(DQ));
+  const s=localStorage.getItem('is3');custSys=s?JSON.parse(s):[];
+  if(!q)save();
+}
+function save(){localStorage.setItem('iq3',JSON.stringify(Qs));localStorage.setItem('is3',JSON.stringify(custSys));}
+function getSys(){return[...new Set(['혈액·면역계','순환계','내분비계',...custSys,...Qs.map(q=>q.system)])];}
+function getDates(){return[...new Set(Qs.map(q=>q.date).filter(Boolean))].sort();}
+function kwd(q,k){return(q.kwDesc&&q.kwDesc[k])||KWD[k]||null;}
+function hl(t){if(!srchF)return t;const re=new RegExp(`(${srchF.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi');return t.replace(re,'<mark>$1</mark>');}
+function filtered(){
+  return Qs.filter(q=>{
+    if(lvF&&q.level!==lvF)return false;
+    if(sysF&&q.system!==sysF)return false;
+    if(dateF&&q.date!==dateF)return false;
+    if(srchF){const s=srchF.toLowerCase();if(!q.question.toLowerCase().includes(s)&&!q.keywords.some(k=>k.toLowerCase().includes(s)))return false;}
+    return true;
+  });
+}
+
+// ══════════════════════
+// RENDER
+// ══════════════════════
+function render(){
+  const f=filtered(),sys=getSys(),dates=getDates();
+  document.getElementById('vcnt').textContent=f.length;
+  document.getElementById('tcnt').textContent=Qs.length;
+  [1,2,3].forEach(l=>{
+    document.getElementById(`lc${l}`).textContent=`(${Qs.filter(q=>q.level===l).length})`;
+    document.getElementById(`leg${l}`).classList.toggle('on',lvF===l);
+  });
+  // chips
+  const ce=document.getElementById('sysChips');ce.innerHTML='';
+  [['전체',null],...sys.map(s=>[s,s])].forEach(([lb,v])=>{
+    const b=document.createElement('button');
+    b.className='chip'+(sysF===v&&v!==null?' on':(!v&&!sysF?' on':''));
+    b.textContent=lb;b.onclick=()=>{sysF=v;doFilter();};ce.appendChild(b);
+  });
+  // date dropdown
+  const dd=document.getElementById('dateDd');
+  dd.innerHTML='<option value="">전체 날짜</option>';
+  dates.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;if(d===dateF)o.selected=true;dd.appendChild(o);});
+  dd.value=dateF||'';dd.classList.toggle('sel',!!dateF);
+  // cards
+  const mc=document.getElementById('main');mc.innerHTML='';
+  const icons={'혈액·면역계':'🩸','순환계':'💓','내분비계':'⚗️'};
+  const grp=sysF?[sysF]:sys;
+  grp.forEach(sys=>{
+    const sq=f.filter(q=>q.system===sys);if(!sq.length)return;
+    const sec=document.createElement('div');sec.className='ssec';
+    const hdr=document.createElement('div');hdr.className='shdr';
+    hdr.innerHTML=`<span class="sicon">${icons[sys]||'🔬'}</span><span class="sname">${sys}</span><span class="scnt">${sq.length}개</span>${admin?`<button class="sb sb-sm" style="margin-left:8px" onclick="openAddM('${sys}')">+ 질문 추가</button>`:''}`;
+    sec.appendChild(hdr);
+    const g=document.createElement('div');g.className='cgrid';
+    sq.forEach(q=>g.appendChild(mkCard(q)));
+    sec.appendChild(g);mc.appendChild(sec);
+  });
+  if(!f.length){mc.innerHTML='<div class="empty"><div class="empty-ico">🔍</div><div class="empty-t">표시할 질문이 없습니다</div><div>다른 필터나 검색어를 시도해 보세요</div></div>';}
+}
+
+function mkCard(q){
+  const lv=`lv${q.level}`,bi=BI[q.level];
+  const c=document.createElement('div');c.className=`qcard ${lv}`;c.id=`c-${q.id}`;
+  const kwH=q.keywords.map(k=>{
+    const d=kwd(q,k);
+    const tip=d?` data-kwtip="${encodeURIComponent(k+'|||'+d)}"`:''  ;
+    return `<span class="kwtag"${tip} onclick="skw('${k.replace(/'/g,"\\'")}')"> ${hl(k)}</span>`;
+  }).join('');
+  const allKw=q.keywords.join(', ');
+  const dc=q.date?`<span class="cdatechip">📅 ${q.date}</span>`:'';
+  const ab=admin?`<div class="cadmbts"><button class="icbtn" onclick="openEditM('${q.id}')" title="수정">✏️</button><button class="icbtn" onclick="openDelM('${q.id}')" title="삭제">🗑️</button></div>`:'';
+  const ad=admin?`<div class="darow"><span class="dalabel">수업날짜:</span><input class="dainput" type="date" value="${q.date||''}" onchange="quickDate('${q.id}',this.value)"></div>`:'';
+  c.innerHTML=`
+    <div class="ctop">
+      <span class="lbadge" data-bloom="${encodeURIComponent(bi.bloom+'|||'+bi.desc)}">${bi.e} ${bi.badge}</span>
+      <div class="cmeta"><span class="cnum">#${String(q.num).padStart(3,'0')}</span>${ab}</div>
+    </div>
+    <p class="qtxt">${hl(q.question)}</p>
+    <div class="kwsec">
+      <div class="kwhdr"><span class="kwlabel">핵심 키워드</span><button class="cpbtn" onclick="cpKw(event,'${allKw.replace(/'/g,"\\'")}')">📋 복사</button></div>
+      <div class="kwtags">${kwH}</div>
+    </div>
+    ${dc}${ad}
+  `;
+  return c;
+}
+
+// ══════════════════════
+// TOOLTIPS via JS (fixed)
+// ══════════════════════
+const bTip=document.getElementById('bloomTip');
+const kTip=document.getElementById('kwTip');
+function posT(el,tip){
+  tip.style.display='block';
+  const r=el.getBoundingClientRect(),tw=tip.offsetWidth,th=tip.offsetHeight;
+  let top=r.top-th-10,left=r.left;
+  if(top<8)top=r.bottom+8;
+  if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;
+  if(left<8)left=8;
+  tip.style.top=top+'px';tip.style.left=left+'px';
+}
+document.addEventListener('mouseover',e=>{
+  const badge=e.target.closest('[data-bloom]');
+  if(badge){const[bl,ds]=decodeURIComponent(badge.dataset.bloom).split('|||');bTip.innerHTML=`<strong>${bl}</strong>${ds}`;posT(badge,bTip);return;}
+  const tag=e.target.closest('[data-kwtip]');
+  if(tag){const[kw,ds]=decodeURIComponent(tag.dataset.kwtip).split('|||');kTip.innerHTML=`<strong>${kw}</strong>${ds}`;posT(tag,kTip);return;}
+  bTip.style.display='none';kTip.style.display='none';
+});
+document.addEventListener('mouseout',()=>{bTip.style.display='none';kTip.style.display='none';});
+window.addEventListener('scroll',()=>{bTip.style.display='none';kTip.style.display='none';},{passive:true});
+
+// ══════════════════════
+// COPY
+// ══════════════════════
+function cpKw(ev,text){
+  const btn=ev.target.closest('.cpbtn');
+  const done=()=>{if(btn){btn.textContent='✅ 복사됨';btn.classList.add('cp');setTimeout(()=>{btn.textContent='📋 복사';btn.classList.remove('cp');},2000);}};
+  navigator.clipboard?navigator.clipboard.writeText(text).then(done).catch(()=>{fb(text);done();}):fb(text)||done();
+}
+function fb(text){const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);}
+
+// ══════════════════════
+// FILTERS
+// ══════════════════════
+function setLv(l){lvF=lvF===l?null:l;render();}
+function onDateChange(s){dateF=s.value||null;render();}
+function doFilter(){srchF=document.getElementById('srch').value.trim();render();}
+function skw(kw){document.getElementById('srch').value=kw;srchF=kw;render();}
+function resetFilters(){if(!confirm('모든 필터와 검색어를 초기화하겠습니다.\n질문 데이터는 유지됩니다.'))return;lvF=null;sysF=null;dateF=null;srchF='';document.getElementById('srch').value='';render();}
+function quickDate(id,v){const i=Qs.findIndex(q=>q.id===id);if(i!==-1){Qs[i].date=v;save();render();}}
+
+// ══════════════════════
+// ADMIN
+// ══════════════════════
+function toggleAdmin(){admin?exitAdmin():openPinOv();}
+function enterAdmin(){admin=true;document.getElementById('admInd').classList.add('on');document.getElementById('admBtn').textContent='🔒 종료';document.getElementById('xlsBtn').style.display='flex';document.getElementById('sysBtn').style.display='flex';document.getElementById('resetBtn').style.display='flex';render();}
+function exitAdmin(){admin=false;document.getElementById('admInd').classList.remove('on');document.getElementById('admBtn').textContent='⚙️ 관리 모드';document.getElementById('xlsBtn').style.display='none';document.getElementById('sysBtn').style.display='none';document.getElementById('resetBtn').style.display='none';render();}
+
+// ══════════════════════
+// PIN
+// ══════════════════════
+function openPinOv(){document.getElementById('pinIn').value='';document.getElementById('pinErr').textContent='';document.getElementById('pinOv').classList.add('op');setTimeout(()=>document.getElementById('pinIn').focus(),100);}
+function closePinOv(){document.getElementById('pinOv').classList.remove('op');}
+function onPin(){if(document.getElementById('pinIn').value.length===4)setTimeout(doPin,80);}
+function doPin(){const v=document.getElementById('pinIn').value;if(v===PIN){closePinOv();enterAdmin();}else{document.getElementById('pinErr').textContent='PIN이 올바르지 않습니다.';document.getElementById('pinIn').value='';document.getElementById('pinIn').focus();}}
+
+// ══════════════════════
+// EDIT / ADD
+// ══════════════════════
+function onSysChg(){document.getElementById('newSysG').style.display=document.getElementById('eSys').value==='__new__'?'block':'none';}
+function buildSysSel(sel){const el=document.getElementById('eSys');el.innerHTML='';getSys().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===sel)o.selected=true;el.appendChild(o);});const n=document.createElement('option');n.value='__new__';n.textContent='+ 새 계통 추가';el.appendChild(n);}
+function openAddM(sys){editId=null;document.getElementById('editTitle').textContent='핵심질문 추가';document.getElementById('eid').value='';buildSysSel(sys||getSys()[0]);document.getElementById('eLv').value='1';document.getElementById('eDate').value='';document.getElementById('eQ').value='';document.getElementById('eKw').value='';document.getElementById('eKwD').value='';document.getElementById('newSysG').style.display='none';document.getElementById('editOv').classList.add('op');}
+function openEditM(id){const q=Qs.find(x=>x.id===id);if(!q)return;editId=id;document.getElementById('editTitle').textContent='핵심질문 수정';document.getElementById('eid').value=id;buildSysSel(q.system);document.getElementById('eLv').value=q.level;document.getElementById('eDate').value=q.date||'';document.getElementById('eQ').value=q.question;document.getElementById('eKw').value=q.keywords.join(', ');document.getElementById('eKwD').value=Object.entries(q.kwDesc||{}).map(([k,v])=>`${k}|${v}`).join('\n');document.getElementById('newSysG').style.display='none';document.getElementById('editOv').classList.add('op');}
+function closeEditOv(){document.getElementById('editOv').classList.remove('op');}
+function saveQ(){
+  let sys=document.getElementById('eSys').value;
+  if(sys==='__new__'){sys=document.getElementById('newSysIn').value.trim();if(!sys){alert('새 계통 이름을 입력하세요.');return;}if(!custSys.includes(sys))custSys.push(sys);}
+  const lv=parseInt(document.getElementById('eLv').value),date=document.getElementById('eDate').value,q=document.getElementById('eQ').value.trim(),kws=document.getElementById('eKw').value.split(',').map(k=>k.trim()).filter(Boolean);
+  const kd={};document.getElementById('eKwD').value.trim().split('\n').forEach(ln=>{const[k,...r]=ln.split('|');if(k&&r.length)kd[k.trim()]=r.join('|').trim();});
+  if(!q||!sys){alert('질문과 계통을 입력해 주세요.');return;}
+  if(editId){const i=Qs.findIndex(x=>x.id===editId);if(i!==-1)Qs[i]={...Qs[i],system:sys,level:lv,date,question:q,keywords:kws,kwDesc:kd};}
+  else{const m=Qs.reduce((mx,x)=>Math.max(mx,x.num),0);Qs.push({id:'q'+Date.now(),num:m+1,level:lv,system:sys,date,question:q,keywords:kws,kwDesc:kd});}
+  save();closeEditOv();render();
+}
+
+// ══════════════════════
+// DELETE
+// ══════════════════════
+function openDelM(id){delId=id;document.getElementById('delOv').classList.add('op');}
+function closeDelOv(){document.getElementById('delOv').classList.remove('op');delId=null;}
+function doDelete(){if(!delId)return;Qs=Qs.filter(q=>q.id!==delId);save();closeDelOv();render();}
+
+// ══════════════════════
+// SYSTEM MANAGEMENT
+// ══════════════════════
+function openSysModal(){renderSysList();document.getElementById('sysOv').classList.add('op');}
+function closeSysOv(){document.getElementById('sysOv').classList.remove('op');}
+function renderSysList(){
+  const el=document.getElementById('sysList');el.innerHTML='';
+  getSys().forEach(s=>{
+    const row=document.createElement('div');row.className='sysrow';
+    const ic=custSys.includes(s);
+    row.innerHTML=`<span style="font-size:13px;color:var(--text)">${s}</span><div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:var(--muted)">${Qs.filter(q=>q.system===s).length}개</span>${ic?`<button class="sb sb-sm sb-red" onclick="rmSys('${s}')">삭제</button>`:'<span style="font-size:10px;color:var(--muted)">기본</span>'}</div>`;
+    el.appendChild(row);
+  });
+}
+function addSys(){const n=document.getElementById('newSysN').value.trim();if(!n){alert('계통 이름을 입력하세요.');return;}if(!custSys.includes(n))custSys.push(n);save();document.getElementById('newSysN').value='';renderSysList();render();}
+function rmSys(s){if(Qs.some(q=>q.system===s)){alert(`'${s}' 계통에 연결된 질문이 있어 삭제할 수 없습니다.`);return;}custSys=custSys.filter(x=>x!==s);save();renderSysList();render();}
+
+// ══════════════════════
+// EXPORT
+// ══════════════════════
+function exportCsv(){
+  const ln={1:'개념의 구조화',2:'메커니즘 인사이트',3:'융합적 문제해결'};
+  const rows=[['번호','단계','성취차원','신체계통','핵심질문','핵심키워드','수업날짜']];
+  Qs.forEach(q=>rows.push([q.num,q.level,ln[q.level]||'',q.system,q.question,q.keywords.join(', '),q.date||'']));
+  let csv='\uFEFF';rows.forEach(r=>{csv+=r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')+'\r\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`인체구조기능_핵심질문_${new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','')}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+// ══════════════════════
+// INIT
+// ══════════════════════
+document.querySelectorAll('.ov').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('op');}));
+window.addEventListener('scroll',()=>document.getElementById('stb').classList.toggle('on',scrollY>300),{passive:true});
+load();render();
+</script>
+</body>
+</html>
